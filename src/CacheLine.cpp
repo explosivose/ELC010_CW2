@@ -1,5 +1,24 @@
-#include "types.h"
-#include "Cache.h"
+#include <types.h>
+#include <Cache.h>
+
+/****   Cache Line byte map
+    [ 0] valid flag (bool)
+    [ 1] dirty bit (bool)
+    [ 2] tag
+    [ 3] data
+    [ 4] data
+    [ 5] data
+    [ 6] data
+    [ 7]
+    [ 8]
+    [ 9]
+    [10]
+    [11]
+    [12]
+    [13]
+    [14]
+    [15]
+ ****/
 
 /// Length is measured in bytes
 /// Default length is 4 words, 16 bytes, 128 bits
@@ -27,12 +46,24 @@ CacheLine::~CacheLine()
     delete [] pLine;
 }
 
+u16 CacheLine::getLength()
+{
+    return Length;
+}
+
 bool CacheLine::IsValid()
 {
     return (pLine[0] != 0);
 }
 
-u16 CacheLine::getLength()
+bool CacheLine::IsDirty()
 {
-    return Length;
+    return (pLine[1] != 0);
 }
+
+u8 CacheLine::getTag()
+{
+    return pLine[2];
+}
+
+

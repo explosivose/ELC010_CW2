@@ -1,4 +1,6 @@
 #include <iostream>
+#include <types.h>
+#include <Cache.h>
 
 using namespace std;
 
