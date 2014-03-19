@@ -6,5 +6,20 @@
 
 1393506313 c:\users\matt\documents\github\elc010_cw2\include\types.h
 
-1394041786 c:\users\matt\documents\github\elc010_cw2\include\cache.h
+1394042074 c:\users\matt\documents\github\elc010_cw2\include\cache.h
+
+1394041935 source:c:\users\matt\documents\github\elc010_cw2\src\cacheline.cpp
+	<types.h>
+	<Cache.h>
+
+1394042364 source:c:\users\matt\documents\github\elc010_cw2\src\cache.cpp
+	<types.h>
+	<Cache.h>
+	<math.h>
+
+1395230344 source:c:\users\matt\documents\github\elc010_cw2\src\cpuinstruction.cpp
+	<types.h>
+	<CPUInstruction.h>
+
+1395230243 c:\users\matt\documents\github\elc010_cw2\include\cpuinstruction.h
 
