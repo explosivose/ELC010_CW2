@@ -15,13 +15,13 @@ unsigned int MainMemory::length = 4096;
 // sets a new main memory length
 // todo: resize existing data*
 //		OR: do nothing if there are any instances of MainMemory
-void MainMemory::setMemoryLength(const unsigned int len)
+void MainMemory::setLength(const unsigned int len)
 {
 	MainMemory::length = len;
 }
 
 // return the length of main memory
-unsigned int MainMemory::getMemoryLength()
+unsigned int MainMemory::getLength()
 {
 	return MainMemory::length;
 }

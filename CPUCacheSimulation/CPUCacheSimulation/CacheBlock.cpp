@@ -97,7 +97,7 @@ void CacheBlock::isDirty(const bool d)
 // fill the cache line with data
 void CacheBlock::LineFill(const unsigned int* data)
 {
-	for (int i = 0; i < CacheBlock::lineLength; i++)
+	for (unsigned int i = 0; i < CacheBlock::lineLength; i++)
 	{
 		line[i] = data[i];
 	}

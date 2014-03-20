@@ -1,3 +1,4 @@
+#include <vector>
 
 /* Cache Simulation
 
@@ -38,8 +39,10 @@ class MainMemory
 	public:
 
 		// class statics
-		static void setMemoryLength(const unsigned int);
-		static unsigned int getMemoryLength();
+		// note probably don't need statics for MainMemory!
+		// because there's only ever gonna be one mainMemory...
+		static void setLength(const unsigned int);
+		static unsigned int getLength();
 
 		// constructor / destructor
 		MainMemory();
@@ -96,8 +99,10 @@ class Cache
 	public:
 
 		// class statics
-		static void setCacheLength(const unsigned int);
-		static unsigned int getCacheLength();
+		// note: probably dont need statics for Cache!
+		// because there's only ever gonna be one cache here...
+		static void setLength(const unsigned int);
+		static unsigned int getLength();
 
 		// constructor / destructor
 		Cache();
@@ -111,11 +116,16 @@ class Cache
 
 		static unsigned int length;
 
-		bool cacheReady;									// false if no reference to MainMemory;
-
-		MainMemory* memory;									// pointer to single instance of main memory
-		CacheBlock* block;									// dynamic array of cache blocks
-
+		void init();
 		bool Hit(unsigned int index, unsigned int tag);		// true or false for cache hit
 		bool ValidIndex(unsigned int index);				// check address range
+		
+		bool cacheReady;									// false if no reference to MainMemory;
+		unsigned int selectBitsLength;						// number of bits required to select a data word
+		unsigned int indexLength;							// number of bits required to index the cache
+		unsigned int tagLength;								// number of bits required for tag
+
+		MainMemory* memory;									// pointer to single instance of main memory
+		std::vector<CacheBlock> block;							// dynamic array of cache blocks
+
 };
