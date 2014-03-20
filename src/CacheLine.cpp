@@ -1,24 +1,29 @@
 #include <types.h>
 #include <Cache.h>
 
-/****   Cache Line byte map
-    [ 0] valid flag (bool)
-    [ 1] dirty bit (bool)
-    [ 2] tag
-    [ 3] data
-    [ 4] data
-    [ 5] data
-    [ 6] data
-    [ 7]
-    [ 8]
-    [ 9]
-    [10]
-    [11]
-    [12]
-    [13]
-    [14]
-    [15]
- ****/
+/* Cache Byte Map
+
+[ 0] valid flag (bool)
+[ 1] dirty flag (bool)
+[ 2] tag (2 bit for task one)
+[ 3] data word 1
+[ 4] data word 1
+[ 5] data word 1
+[ 6] data word 1
+[ 7] data word 2
+[ 8] data word 2
+[ 9] data word 2
+[10] data word 2
+[11] data word 3
+[12] data word 3
+[13] data word 3
+[14] data word 3
+[15] data word 4
+[16] data word 4
+[17] data word 4
+[18] data word 4
+
+*/
 
 /// Length is measured in bytes
 /// Default length is 4 words, 16 bytes, 128 bits
