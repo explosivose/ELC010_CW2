@@ -1,3 +1,5 @@
+#pragma once
+
 static int powbase2(int);
 
 static int powbase2(unsigned int power)

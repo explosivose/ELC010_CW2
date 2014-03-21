@@ -3,14 +3,59 @@
 
 using namespace std;
 
-// Main Memory Statics
+// Constructor / Destructor
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+
+// constructor allocates memory for data*
+MainMemory::MainMemory(void)
+{
+	length = 4096;
+	Data = new unsigned int[length];
+}
+
+MainMemory::MainMemory(const unsigned int size)
+{
+	length = size;
+	Data = new unsigned int[length];
+}
+
+// destructor releases memory used by data*
+MainMemory::~MainMemory(void)
+{
+	delete [] Data;
+}
+
+// public functions
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // 
 //
 
-// main memory length measured in bytes
-// default length is 4096
-unsigned int MainMemory::length = 4096;
+unsigned int MainMemory::Read(const unsigned int address)
+{
+	if ( ValidAddress(address) )
+	{
+		return Data[address];
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+void MainMemory::Write(const unsigned int address, const unsigned int data)
+{
+	if ( ValidAddress(address) )
+	{
+		Data[address] = data;
+	}
+}
+
+// Private Functions
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
 
 // sets a new main memory length
 // todo: resize existing data*
@@ -26,59 +71,7 @@ unsigned int MainMemory::getLength()
 	return MainMemory::length;
 }
 
-// Constructor / Destructor
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//
-
-// constructor allocates memory for data*
-MainMemory::MainMemory()
-{
-	Data = new unsigned int[MainMemory::length];
-}
-
-// destructor releases memory used by data*
-MainMemory::~MainMemory()
-{
-	delete [] Data;
-}
-
-// Getter functions
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// 
-//
-
-unsigned int MainMemory::Read(unsigned int address)
-{
-	if ( ValidAddress(address) )
-	{
-		return Data[address];
-	}
-	else
-	{
-		return 0;
-	}
-}
-
-// Setter functions
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//
-
-void MainMemory::Write(unsigned int address, unsigned int data)
-{
-	if ( ValidAddress(address) )
-	{
-		Data[address] = data;
-	}
-}
-
-// Private Functions
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//
-
-bool MainMemory::ValidAddress(unsigned int address)
+bool MainMemory::ValidAddress(const unsigned int address)
 {
 	// check range of address
 	if (address > MainMemory::length)

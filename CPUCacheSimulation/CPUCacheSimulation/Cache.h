@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 
 /* Cache Simulation
@@ -38,25 +39,22 @@ class MainMemory
 {
 	public:
 
-		// class statics
-		// note probably don't need statics for MainMemory!
-		// because there's only ever gonna be one mainMemory...
-		static void setLength(const unsigned int);
-		static unsigned int getLength();
-
 		// constructor / destructor
-		MainMemory();
-		~MainMemory();
+		MainMemory(void);
+		MainMemory(const unsigned int bytes);
+		~MainMemory(void);
 
-		unsigned int Read(unsigned int address);				// return data at memory address
-		void Write(unsigned int address, unsigned int data);	// write data to memory address
+		void setLength(const unsigned int);
+		unsigned int getLength();
+		unsigned int Read(const unsigned int address);				// return data at memory address
+		void Write(const unsigned int address, const unsigned int data);	// write data to memory address
 
 	private:
 
-		static unsigned int length;
+		unsigned int length;									// size of memory in bytes (default is 4096)
 		unsigned int* Data;
 
-		bool ValidAddress(unsigned int address);
+		bool ValidAddress(const unsigned int address);
 };
 
 class CacheBlock
@@ -68,8 +66,8 @@ class CacheBlock
 		static unsigned int getLineLength();
 		
 		// constructor / destructor
-		CacheBlock();
-		~CacheBlock();
+		CacheBlock(void);
+		~CacheBlock(void);
 		
 		// getters
 		bool isValid();
@@ -98,28 +96,23 @@ class Cache
 {
 	public:
 
-		// class statics
-		// note: probably dont need statics for Cache!
-		// because there's only ever gonna be one cache here...
-		static void setLength(const unsigned int);
-		static unsigned int getLength();
-
 		// constructor / destructor
-		Cache();
+		Cache(void);
 		Cache(MainMemory*);
-		~Cache();
+		~Cache(void);
 
+		void setLength(const unsigned int);
+		unsigned int getLength();
 		unsigned int Read(unsigned int address);				// return data at memory address
 		void Write(unsigned int address, unsigned int data);	// write data to memory address
 
 	private:
 
-		static unsigned int length;
-
 		void init();
 		bool Hit(unsigned int index, unsigned int tag);		// true or false for cache hit
 		bool ValidIndex(unsigned int index);				// check address range
 		
+		unsigned int length;								// size of the cache in bytes (default is 1024)
 		bool cacheReady;									// false if no reference to MainMemory;
 		unsigned int selectBitsLength;						// number of bits required to select a data word
 		unsigned int indexLength;							// number of bits required to index the cache

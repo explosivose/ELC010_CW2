@@ -32,13 +32,13 @@ unsigned int CacheBlock::getLineLength()
 //
 
 // constructor alocates memory for cache line
-CacheBlock::CacheBlock()
+CacheBlock::CacheBlock(void)
 {
 	line = new unsigned int[CacheBlock::lineLength];
 }
 
 // destructor releases memory used by cache line
-CacheBlock::~CacheBlock()
+CacheBlock::~CacheBlock(void)
 {
 	delete [] line;
 }

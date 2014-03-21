@@ -7,42 +7,32 @@
 
 using namespace std;
 
-// Cache Statics
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// 
-//
-
-// cache length measured in bytes
-// default length is 1024 bytes
-unsigned int Cache::length = 1024;
-
-void Cache::setLength(const unsigned int len)
-{
-	Cache::length = len;
-}
-
-unsigned int Cache::getLength()
-{
-	return Cache::length;
-}
-
 // Constructor / Destructor
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //
 
-Cache::Cache()
+Cache::Cache(void)
 {
+	length = 1024;
 	cacheReady = false;
 }
 
 Cache::Cache(MainMemory* mainMemory)
 {
+	length = 1024;
 	memory = mainMemory;
 	init();
 }
 
-Cache::~Cache()
+Cache::Cache(MainMemory* mainMemory, unsigned int size)
+{
+	length = size;
+	memory = mainMemory;
+	init();
+}
+
+Cache::~Cache(void)
 {
 	
 }
@@ -116,6 +106,18 @@ void Cache::init()
 
 	cacheReady = true;
 }
+
+// this function should also resize the block!
+void Cache::setLength(const unsigned int len)
+{
+	length = len;
+}
+
+unsigned int Cache::getLength()
+{
+	return length;
+}
+
 
 bool Cache::Hit(unsigned int index, unsigned int tag)
 {
