@@ -12,11 +12,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cache.h" />
+    <ClInclude Include="CPUTrace.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cache.cpp" />
     <ClCompile Include="CacheBlock.cpp" />
+    <ClCompile Include="CPUInstruction.cpp" />
+    <ClCompile Include="CPUTrace.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMemory.cpp" />
   </ItemGroup>
