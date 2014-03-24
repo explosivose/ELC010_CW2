@@ -99,12 +99,13 @@ class Cache
 		// constructor / destructor
 		Cache(void);
 		Cache(MainMemory*);
+		Cache(MainMemory*, unsigned int);
 		~Cache(void);
 
 		void setLength(const unsigned int);
 		unsigned int getLength();
-		unsigned int Read(unsigned int address);				// return data at memory address
-		void Write(unsigned int address, unsigned int data);	// write data to memory address
+		unsigned int Read(const unsigned int address);				// return data at memory address
+		void Write(const unsigned int address, const unsigned int data);	// write data to memory address
 
 	private:
 

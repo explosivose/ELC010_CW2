@@ -1,6 +1,7 @@
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <sstream>
+#include <fstream>
 #include <cstdlib>
 #include "CPUTrace.h"
 
@@ -20,6 +21,28 @@ CPUTrace::~CPUTrace(void)
 {
 }
 
+void CPUTrace::init()
+{
+	fstream fs;
+	string traceString;
+	fs.open("trace.txt", ios_base::in);
+	if ( !fs.good() )
+	{
+		cout << "Could not open trace.txt" << endl;
+		ready = false;
+	}
+	else
+	{
+		// copy trace file contents to trace string
+		fs.seekg(0, ios::end);
+		traceString.reserve(fs.tellg());		// (allocating memory for string upfront)
+		fs.seekg(0, ios::beg);
+		traceString.assign((istreambuf_iterator<char>(fs)),istreambuf_iterator<char>());
+		trace= istringstream(traceString);
+		ready = true;
+	}
+	fs.close();
+}
 
 // public functions
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -35,7 +58,8 @@ void CPUTrace::GetNextInstruction(CPUInstruction &i)
 	}
 
 	string readLine;
-	getline(f, readLine);
+	getline(trace, readLine);
+	
 
 	bool write = false;
 	unsigned int address = strtoul(readLine.substr(5, 8).c_str(), NULL, 16);
@@ -63,16 +87,3 @@ void CPUTrace::GetNextInstruction(CPUInstruction &i)
 //
 //
 
-void CPUTrace::init()
-{
-	f.open("trace.txt", ios_base::in);
-	if ( !f.good() )
-	{
-		cout << "Could not open trace.txt" << endl;
-		ready = false;
-	}
-	else
-	{
-		ready = true;
-	}
-}

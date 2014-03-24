@@ -42,7 +42,7 @@ Cache::~Cache(void)
 // 
 //
 
-unsigned int Cache::Read(unsigned int address)
+unsigned int Cache::Read(const unsigned int address)
 {
 	// from address take the tag, index, select bits 
 	// bits to extract = pow(2, length) - 1 << offset
@@ -97,11 +97,11 @@ void Cache::init()
 	// number of tag bits depends on memory length and cache length
 	//		= floor(log2(Memory::length / Cache::length)) + 1
 	//		floor(log2(4096/1024)) + 1 = 2
-	tagLength = floor(log(MainMemory::getLength()/length)/log(2)) + 1;
+	tagLength = floor(log(memory->getLength()/length)/log(2)) + 1;
 	
 	// intialise the cache blocks
-	block.reserve(Cache::length);
-	for (unsigned int i = 0; i < Cache::length; i++)
+	block.reserve(length);
+	for (unsigned int i = 0; i < length; i++)
 		block.push_back( CacheBlock() );
 
 	cacheReady = true;
