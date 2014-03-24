@@ -12,7 +12,7 @@ using namespace std;
 //
 //
 
-Cache::Cache(void)
+Cache::Cache()
 {
 	length = 1024;
 	cacheReady = false;
@@ -32,7 +32,7 @@ Cache::Cache(MainMemory* mainMemory, unsigned int size)
 	init();
 }
 
-Cache::~Cache(void)
+Cache::~Cache()
 {
 	
 }
@@ -60,10 +60,10 @@ unsigned int Cache::Read(const unsigned int address)
 	std::bitset<32> b_index(index);
 	std::bitset<32> b_tag(tag);
 
-	cout << "Address: " + b_address.to_string() + " has been separated into: " << endl;
-	cout << "\t select: " + b_sel.to_string() << endl;
-	cout << "\t index: " + b_index.to_string() << endl;
-	cout << "\t tag: " + b_tag.to_string() << endl;
+	cout << "Address: \t" + b_address.to_string() + " has been separated into: " << endl;
+	cout << "select: \t" + b_sel.to_string() << endl;
+	cout << "index: \t\t" + b_index.to_string() << endl;
+	cout << "tag: \t\t" + b_tag.to_string() << endl;
 	
 	return 0;
 }
@@ -85,24 +85,26 @@ void Cache::init()
 
 	// number of select bits depends on the number of words in a cache line
 	//		= floor(log2(CacheBlock::lineLength/4)) + 1
-	//		floor(log2(16/4)) + 1 = 2
+	//		floor(log2(16/4)) + 1 = 3 (should be 2....)
 	// the select bits are the first bits in the address (from the left)
-	selectBitsLength = floor(log(CacheBlock::getLineLength()/4)/log(2)) + 1;
+	selectBitsLength = ceil(log(CacheBlock::getLineLength()/4)/log(2));
 	
 	// number of index bits depends on number of cache blocks
 	//		= floor(log2(Cache::length)) + 1
 	//		floor(log2(1024)) + 1 = 11
-	indexLength = floor(log(length)/log(2)) + 1;
+	indexLength = ceil(log(length)/log(2));
 
 	// number of tag bits depends on memory length and cache length
 	//		= floor(log2(Memory::length / Cache::length)) + 1
-	//		floor(log2(4096/1024)) + 1 = 2
-	tagLength = floor(log(memory->getLength()/length)/log(2)) + 1;
+	//		floor(log2(4096/1024)) + 1 = 3 (should be 2...)
+	tagLength = ceil(log(memory->getLength()/length)/log(2));
 	
 	// intialise the cache blocks
+	block.resize(length);
+	/*
 	block.reserve(length);
 	for (unsigned int i = 0; i < length; i++)
-		block.push_back( CacheBlock() );
+		block.push_back( CacheBlock() );*/
 
 	cacheReady = true;
 }

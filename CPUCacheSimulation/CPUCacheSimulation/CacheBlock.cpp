@@ -32,15 +32,17 @@ unsigned int CacheBlock::getLineLength()
 //
 
 // constructor alocates memory for cache line
-CacheBlock::CacheBlock(void)
+CacheBlock::CacheBlock()
 {
-	line = new unsigned int[CacheBlock::lineLength];
+	line = new unsigned int[CacheBlock::lineLength]();
+	valid = false;
 }
 
 // destructor releases memory used by cache line
-CacheBlock::~CacheBlock(void)
+CacheBlock::~CacheBlock()
 {
-	delete [] line;
+	delete[] line;
+	line = 0;
 }
 
 // Cache Block getters
@@ -61,12 +63,12 @@ bool CacheBlock::isDirty()
 }
 
 // return the tag for this cache block
-int CacheBlock::Tag()
+unsigned int CacheBlock::Tag()
 {
 	return tag;
 }
 
-int CacheBlock::ReadData(const unsigned int offset)
+unsigned int CacheBlock::ReadData(const unsigned int offset)
 {
 	if (offset > CacheBlock::lineLength)
 	{
@@ -95,8 +97,9 @@ void CacheBlock::isDirty(const bool d)
 }
 
 // fill the cache line with data
-void CacheBlock::LineFill(const unsigned int* data)
+void CacheBlock::LineFill(const unsigned int Tag, const unsigned int* data)
 {
+	tag = Tag;
 	for (unsigned int i = 0; i < CacheBlock::lineLength; i++)
 	{
 		line[i] = data[i];

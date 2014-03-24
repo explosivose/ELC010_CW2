@@ -1,5 +1,5 @@
 #pragma once
-#include <sstream>
+#include<fstream>
 
 class CPUInstruction
 {
@@ -22,14 +22,9 @@ class CPUTrace
 	public:
 		CPUTrace(void);
 		~CPUTrace(void);
-		void GetNextInstruction(CPUInstruction&);
+		void GetNextInstruction(CPUInstruction&, std::ifstream&);
 	private:
-		void init();
-		std::istringstream trace;	// can't be doing this....
 
-		// suggest that fstream exists in main and CPUTrace::GetNextInstruction(CPUInstruction& i, fstream& fs)
-		
-		bool ready;
-		
+
 };
 

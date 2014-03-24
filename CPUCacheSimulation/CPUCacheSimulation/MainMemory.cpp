@@ -9,7 +9,7 @@ using namespace std;
 //
 
 // constructor allocates memory for data*
-MainMemory::MainMemory(void)
+MainMemory::MainMemory()
 {
 	length = 4096;
 	Data = new unsigned int[length];
@@ -24,7 +24,7 @@ MainMemory::MainMemory(const unsigned int size)
 // destructor releases memory used by data*
 MainMemory::~MainMemory(void)
 {
-	delete [] Data;
+	delete[] Data;
 }
 
 // public functions

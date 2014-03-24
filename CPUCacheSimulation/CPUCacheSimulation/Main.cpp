@@ -1,4 +1,5 @@
-#include <ostream>
+#include <iostream>
+#include <fstream>
 #include "CPUTrace.h"
 #include "Cache.h"
 
@@ -6,25 +7,34 @@ using namespace std;
 
 int main()
 {
+	ifstream fs;
+	fs.open("trace.txt");
+
+	if ( !fs.good() )
+	{
+		cout << "Could not open trace.txt" << endl;
+		cin.ignore();
+		return 0;
+	}
+
 	CPUTrace trace;
 	CPUInstruction instruction;
 	MainMemory memory;
-	Cache cache;
-
-	trace = CPUTrace();
-	memory = MainMemory();
-	cache = Cache(&memory);
-
-	trace.GetNextInstruction(instruction);
-
-	if (instruction.isWrite())
+	Cache cache(&memory);
+	
+	while (!fs.eof())
 	{
-		cache.Write(instruction.getAddress(), instruction.getData());
-	}
-	else
-	{
-		cache.Read(instruction.getAddress());
-	}
+		trace.GetNextInstruction(instruction, fs);
 
+		if (instruction.isWrite())
+		{
+			cache.Write(instruction.getAddress(), instruction.getData());
+		}
+		else
+		{
+			cache.Read(instruction.getAddress());
+		}
+	}
+	cin.ignore();
 	return 0;
 }

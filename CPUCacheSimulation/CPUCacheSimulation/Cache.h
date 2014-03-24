@@ -40,9 +40,9 @@ class MainMemory
 	public:
 
 		// constructor / destructor
-		MainMemory(void);
+		MainMemory();
 		MainMemory(const unsigned int bytes);
-		~MainMemory(void);
+		~MainMemory();
 
 		void setLength(const unsigned int);
 		unsigned int getLength();
@@ -66,26 +66,26 @@ class CacheBlock
 		static unsigned int getLineLength();
 		
 		// constructor / destructor
-		CacheBlock(void);
-		~CacheBlock(void);
+		CacheBlock();
+		~CacheBlock();
 		
 		// getters
 		bool isValid();
 		bool isDirty();
-		int Tag();											// returns the tag of this block
-		int ReadData(const unsigned int);					// returns a data word from the cache line
+		unsigned int Tag();											// returns the tag of this block
+		unsigned int ReadData(const unsigned int);					// returns a data word from the cache line
 
 		// setters
 		void isValid(const bool);
 		void isDirty(const bool);
-		void LineFill(const unsigned int*);					// copy data into cache line
+		void LineFill(const unsigned int, const unsigned int*);					// copy data into cache line
 	
 	private:
 		
 		static unsigned int lineLength;
 		bool valid;
 		bool dirty;
-		int tag;	
+		unsigned int tag;	
 		unsigned int* line;
 		
 };
@@ -97,10 +97,10 @@ class Cache
 	public:
 
 		// constructor / destructor
-		Cache(void);
+		Cache();
 		Cache(MainMemory*);
 		Cache(MainMemory*, unsigned int);
-		~Cache(void);
+		~Cache();
 
 		void setLength(const unsigned int);
 		unsigned int getLength();
