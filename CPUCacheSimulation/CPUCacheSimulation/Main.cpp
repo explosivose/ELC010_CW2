@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <string>
 #include "CPUTrace.h"
 #include "Cache.h"
 

@@ -12,13 +12,21 @@ using namespace std;
 MainMemory::MainMemory()
 {
 	length = 4096;
-	Data = new unsigned int[length];
+	Data = new unsigned int*[length];
+	for (unsigned int i = 0; i < length; i++)
+	{
+		Data[i] = new unsigned int[CacheBlock::getLineLengthWords()];
+	}
 }
 
 MainMemory::MainMemory(const unsigned int size)
 {
 	length = size;
-	Data = new unsigned int[length];
+	Data = new unsigned int*[length];
+	for (unsigned int i = 0; i < length; i++)
+	{
+		Data[i] = new unsigned int[CacheBlock::getLineLengthWords()];
+	}
 }
 
 // destructor releases memory used by data*
@@ -32,8 +40,9 @@ MainMemory::~MainMemory(void)
 // 
 //
 
-unsigned int MainMemory::Read(const unsigned int address)
+unsigned int* MainMemory::ReadBlock(const unsigned int address)
 {
+	
 	if ( ValidAddress(address) )
 	{
 		return Data[address];
@@ -44,11 +53,15 @@ unsigned int MainMemory::Read(const unsigned int address)
 	}
 }
 
-void MainMemory::Write(const unsigned int address, const unsigned int data)
+void MainMemory::WriteBlock(const unsigned int address, const unsigned int* const data)
 {
 	if ( ValidAddress(address) )
 	{
-		Data[address] = data;
+		for (unsigned int i = 0; i < CacheBlock::getLineLengthWords(); i++)
+		{
+			Data[address][i] = data[i];
+		}
+		
 	}
 }
 

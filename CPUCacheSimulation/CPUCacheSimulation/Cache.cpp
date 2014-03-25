@@ -49,23 +49,44 @@ unsigned int Cache::Read(const unsigned int address)
 
 	unsigned int sel = (powbase2(selectBitsLength) - 1) << 0;
 	sel &= address;
+	sel = sel >> 0;
+
 	unsigned int index = (powbase2(indexLength) - 1) << selectBitsLength;
 	index &= address;
+	index = index >> selectBitsLength;
+
 	unsigned int tag = (powbase2(tagLength) - 1) << (selectBitsLength + indexLength);
 	tag &= address;
+	tag = tag >> (selectBitsLength + indexLength);
 
 	// using bitset to print binary
-	std::bitset<32> b_address(address);
-	std::bitset<32> b_sel(sel);
-	std::bitset<32> b_index(index);
-	std::bitset<32> b_tag(tag);
+	bitset<32> b_address(address);
+	bitset<32> b_sel(sel);
+	bitset<32> b_index(index);
+	bitset<32> b_tag(tag);
 
-	cout << "Address: \t" + b_address.to_string() + " has been separated into: " << endl;
-	cout << "select: \t" + b_sel.to_string() << endl;
-	cout << "index: \t\t" + b_index.to_string() << endl;
-	cout << "tag: \t\t" + b_tag.to_string() << endl;
+	cout << "Address: \t" + b_address.to_string() << endl;
+	//cout << "select: \t"  + b_sel.to_string() << endl;
+	//cout << "index: \t\t" + b_index.to_string() << endl;
+	//cout << "tag: \t\t"   + b_tag.to_string() << endl;
 	
-	return 0;
+	if (!Hit(index, tag))
+	{
+		cout << "Cache Miss!" << endl;
+		if ( block[index].isDirty() )
+		{
+			cout << "Writeback!" << endl;
+			memory->WriteBlock(address, block[index].ReadLine());
+		}
+		cout << "Cache Line Fill From Memory!" << endl;
+		block[index].LineFillFromMemory(tag, memory->ReadBlock(address));
+	}
+
+	
+	bitset<32> b_data(block[index].ReadWord(sel));
+	cout << "Data: \t\t" + b_data.to_string() + " from cache read." << endl;
+	cout << endl;
+	return block[index].ReadWord(sel);
 }
 
 void Cache::Write(unsigned int address, unsigned int data)
@@ -87,7 +108,7 @@ void Cache::init()
 	//		= floor(log2(CacheBlock::lineLength/4)) + 1
 	//		floor(log2(16/4)) + 1 = 3 (should be 2....)
 	// the select bits are the first bits in the address (from the left)
-	selectBitsLength = ceil(log(CacheBlock::getLineLength()/4)/log(2));
+	selectBitsLength = ceil(log(CacheBlock::getLineLengthWords())/log(2));
 	
 	// number of index bits depends on number of cache blocks
 	//		= floor(log2(Cache::length)) + 1
@@ -141,7 +162,7 @@ bool Cache::Hit(unsigned int index, unsigned int tag)
 bool Cache::ValidIndex(unsigned int index)
 {
 	// check range of address
-	if (index > Cache::length)
+	if (index >= Cache::length)
 	{
 		cout << "Cache index out of range!!" << endl;
 		return false;

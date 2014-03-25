@@ -46,13 +46,13 @@ class MainMemory
 
 		void setLength(const unsigned int);
 		unsigned int getLength();
-		unsigned int Read(const unsigned int address);				// return data at memory address
-		void Write(const unsigned int address, const unsigned int data);	// write data to memory address
+		unsigned int* ReadBlock(const unsigned int address);				// return data at memory address
+		void WriteBlock(const unsigned int address, const unsigned int* const data);	// write data to memory address
 
 	private:
 
 		unsigned int length;									// size of memory in bytes (default is 4096)
-		unsigned int* Data;
+		unsigned int** Data;
 
 		bool ValidAddress(const unsigned int address);
 };
@@ -63,7 +63,8 @@ class CacheBlock
 		
 		// class statics
 		static void setLineLength(const unsigned int);
-		static unsigned int getLineLength();
+		static unsigned int getLineLengthBytes();
+		static unsigned int getLineLengthWords();
 		
 		// constructor / destructor
 		CacheBlock();
@@ -73,13 +74,15 @@ class CacheBlock
 		bool isValid();
 		bool isDirty();
 		unsigned int Tag();											// returns the tag of this block
-		unsigned int ReadData(const unsigned int);					// returns a data word from the cache line
+		unsigned int ReadWord(const unsigned int);					// returns a data word from the cache line
+		unsigned int* ReadLine();
 
 		// setters
 		void isValid(const bool);
 		void isDirty(const bool);
-		void LineFill(const unsigned int, const unsigned int*);					// copy data into cache line
-	
+		void LineFillFromCPU(const unsigned int Tag, const unsigned int* const data);				// copy CPU data into cache line, set valid and dirty
+		void LineFillFromMemory(const unsigned int Tag, const unsigned int* const data);			// copy memory data into cache line, set valid and not dirty
+
 	private:
 		
 		static unsigned int lineLength;
@@ -111,6 +114,7 @@ class Cache
 
 		void init();
 		bool Hit(unsigned int index, unsigned int tag);		// true or false for cache hit
+		unsigned int ReadFromMemory(unsigned int address);
 		bool ValidIndex(unsigned int index);				// check address range
 		
 		unsigned int length;								// size of the cache in bytes (default is 1024)

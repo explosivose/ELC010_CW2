@@ -21,9 +21,14 @@ void CacheBlock::setLineLength(const unsigned int length)
 }
 
 // return the length of a cache line
-unsigned int CacheBlock::getLineLength()
+unsigned int CacheBlock::getLineLengthBytes()
 {
 	return CacheBlock::lineLength;
+}
+
+unsigned int CacheBlock::getLineLengthWords()
+{
+	return CacheBlock::lineLength/4;
 }
 
 // Constructor / Destructor
@@ -56,10 +61,10 @@ bool CacheBlock::isValid()
 	return valid;
 }
 
-// return the dirty flag for this cache block
+// return the dirty flag for this cache block (can only be dirty if valid)
 bool CacheBlock::isDirty()
 {
-	return dirty;
+	return dirty && valid;
 }
 
 // return the tag for this cache block
@@ -68,7 +73,12 @@ unsigned int CacheBlock::Tag()
 	return tag;
 }
 
-unsigned int CacheBlock::ReadData(const unsigned int offset)
+unsigned int* CacheBlock::ReadLine()
+{
+	return line;
+}
+
+unsigned int CacheBlock::ReadWord(const unsigned int offset)
 {
 	if (offset > CacheBlock::lineLength)
 	{
@@ -97,9 +107,22 @@ void CacheBlock::isDirty(const bool d)
 }
 
 // fill the cache line with data
-void CacheBlock::LineFill(const unsigned int Tag, const unsigned int* data)
+void CacheBlock::LineFillFromCPU(const unsigned int Tag, const unsigned int* data)
 {
 	tag = Tag;
+	valid = true;
+	dirty = true;
+	for (unsigned int i = 0; i < CacheBlock::lineLength; i++)
+	{
+		line[i] = data[i];
+	}
+}
+
+void CacheBlock::LineFillFromMemory(const unsigned int Tag, const unsigned int* data)
+{
+	tag = Tag;
+	valid = true;
+	dirty = false;
 	for (unsigned int i = 0; i < CacheBlock::lineLength; i++)
 	{
 		line[i] = data[i];
