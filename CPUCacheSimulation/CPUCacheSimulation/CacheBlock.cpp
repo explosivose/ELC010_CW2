@@ -106,6 +106,22 @@ void CacheBlock::isDirty(const bool d)
 	dirty = d;
 }
 
+void CacheBlock::WriteWord(const unsigned int offset, const unsigned int data)
+{
+	if (offset > CacheBlock::lineLength)
+	{
+		cout << "Error! Data offset greater than cache line length" << endl;
+		return;
+	}
+	line[offset] = data;
+}
+
+	// problem with the two LineFill functions: size of data[] cannot be determined here.
+	// if size of data[] is less than CacheBlock::lineLength, we're writing garbage to line[]!
+	// use C++ vectors instead? then change function to return bool indicating success
+	//	(another advantage of using vectors instead: much easier to debug! data in vectors is exposed to debugger)
+	// or ensure that only memory blocks are passed somehow (since their size is always CacheBlock::lineLength)
+
 // fill the cache line with data
 void CacheBlock::LineFillFromCPU(const unsigned int Tag, const unsigned int* data)
 {

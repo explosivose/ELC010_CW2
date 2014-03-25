@@ -44,33 +44,10 @@ Cache::~Cache()
 
 unsigned int Cache::Read(const unsigned int address)
 {
-	// from address take the tag, index, select bits 
-	// bits to extract = pow(2, length) - 1 << offset
-
-	unsigned int sel = (powbase2(selectBitsLength) - 1) << 0;
-	sel &= address;
-	sel = sel >> 0;
-
-	unsigned int index = (powbase2(indexLength) - 1) << selectBitsLength;
-	index &= address;
-	index = index >> selectBitsLength;
-
-	unsigned int tag = (powbase2(tagLength) - 1) << (selectBitsLength + indexLength);
-	tag &= address;
-	tag = tag >> (selectBitsLength + indexLength);
-
-	// using bitset to print binary
-	bitset<32> b_address(address);
-	bitset<32> b_sel(sel);
-	bitset<32> b_index(index);
-	bitset<32> b_tag(tag);
-
-	cout << "Address: \t" + b_address.to_string() << endl;
-	//cout << "select: \t"  + b_sel.to_string() << endl;
-	//cout << "index: \t\t" + b_index.to_string() << endl;
-	//cout << "tag: \t\t"   + b_tag.to_string() << endl;
+	ProcessAddress(address);	// extract sel, index and tag
 	
-	if (!Hit(index, tag))
+	cout << "Cache Read..." << endl;
+	if (!Hit())
 	{
 		cout << "Cache Miss!" << endl;
 		if ( block[index].isDirty() )
@@ -86,11 +63,39 @@ unsigned int Cache::Read(const unsigned int address)
 	bitset<32> b_data(block[index].ReadWord(sel));
 	cout << "Data: \t\t" + b_data.to_string() + " from cache read." << endl;
 	cout << endl;
+
 	return block[index].ReadWord(sel);
 }
 
 void Cache::Write(unsigned int address, unsigned int data)
 {
+	ProcessAddress(address);
+
+	cout << "Cache Write..." << endl;
+	if (!Hit())
+	{
+		if ( block[index].isDirty() )
+		{
+			cout << "Writeback!" << endl;
+			memory->WriteBlock(address, block[index].ReadLine());
+		}
+		cout << "Cache Line Fill From Memory!" << endl;
+		block[index].LineFillFromMemory(tag, memory->ReadBlock(address));
+	}
+	
+	// re-evaluate cache hit to check that LineFillFromMemory was successful
+	// maybe change LineFillFromMemory to return true on success
+	if (Hit())
+	{
+		cout << "Write data word to cache!" << endl;
+		block[index].WriteWord(sel, data);
+		block[index].isDirty(true);
+	}
+	else
+	{
+		cout << "Could not write to cache!" << endl;
+	}
+	cout << endl;
 
 }
 
@@ -141,10 +146,39 @@ unsigned int Cache::getLength()
 	return length;
 }
 
-
-bool Cache::Hit(unsigned int index, unsigned int tag)
+void Cache::ProcessAddress(unsigned int address)
 {
-	if (!ValidIndex(index)) return false;
+	// from address take the tag, index, select bits 
+	// bits to extract = pow(2, length) - 1 << offset
+
+	sel = (powbase2(selectBitsLength) - 1) << 0;
+	sel &= address;
+	sel = sel >> 0;
+
+	index = (powbase2(indexLength) - 1) << selectBitsLength;
+	index &= address;
+	index = index >> selectBitsLength;
+
+	tag = (powbase2(tagLength) - 1) << (selectBitsLength + indexLength);
+	tag &= address;
+	tag = tag >> (selectBitsLength + indexLength);
+
+	/* using bitset to print binary
+	bitset<32> b_address(address);
+	bitset<32> b_sel(sel);
+	bitset<32> b_index(index);
+	bitset<32> b_tag(tag);
+
+	cout << "Address: \t" + b_address.to_string() << endl;
+	cout << "select: \t"  + b_sel.to_string() << endl;
+	cout << "index: \t\t" + b_index.to_string() << endl;
+	cout << "tag: \t\t"   + b_tag.to_string() << endl;
+	//*/
+}
+
+bool Cache::Hit()
+{
+	if (!ValidIndex()) return false;
 
 	bool hit = false;
 
@@ -159,7 +193,7 @@ bool Cache::Hit(unsigned int index, unsigned int tag)
 	return hit;
 }
 
-bool Cache::ValidIndex(unsigned int index)
+bool Cache::ValidIndex()
 {
 	// check range of address
 	if (index >= Cache::length)
@@ -171,4 +205,9 @@ bool Cache::ValidIndex(unsigned int index)
 	{
 		return true;
 	}
+}
+
+void Cache::Evict(unsigned int address)
+{
+
 }

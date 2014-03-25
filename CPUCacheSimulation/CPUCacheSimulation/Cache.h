@@ -80,6 +80,7 @@ class CacheBlock
 		// setters
 		void isValid(const bool);
 		void isDirty(const bool);
+		void WriteWord(const unsigned int offset, const unsigned int data);
 		void LineFillFromCPU(const unsigned int Tag, const unsigned int* const data);				// copy CPU data into cache line, set valid and dirty
 		void LineFillFromMemory(const unsigned int Tag, const unsigned int* const data);			// copy memory data into cache line, set valid and not dirty
 
@@ -112,18 +113,23 @@ class Cache
 
 	private:
 
-		void init();
-		bool Hit(unsigned int index, unsigned int tag);		// true or false for cache hit
-		unsigned int ReadFromMemory(unsigned int address);
-		bool ValidIndex(unsigned int index);				// check address range
-		
+		void init();										// allocate memory for cache, calculate bit lengths for sel, tag and index
+		void ProcessAddress(unsigned int address);			// calculate sel, tag and index from CPU address
+		bool Hit();											// true or false for cache hit 
+		bool ValidIndex();									// check index range
+		void Evict(unsigned int address);										// check dirty bit and perform writeback if necessary
+
 		unsigned int length;								// size of the cache in bytes (default is 1024)
 		bool cacheReady;									// false if no reference to MainMemory;
 		unsigned int selectBitsLength;						// number of bits required to select a data word
 		unsigned int indexLength;							// number of bits required to index the cache
 		unsigned int tagLength;								// number of bits required for tag
 
+		unsigned int sel;									// select bits choose a data word in a cache line or memory block
+		unsigned int tag;									// tag indicates which memory block is currently in cache line
+		unsigned int index;									// index selects a cache block 
+
 		MainMemory* memory;									// pointer to single instance of main memory
-		std::vector<CacheBlock> block;							// dynamic array of cache blocks
+		std::vector<CacheBlock> block;						// dynamic array of cache blocks
 
 };
