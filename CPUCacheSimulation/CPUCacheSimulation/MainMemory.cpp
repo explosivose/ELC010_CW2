@@ -86,8 +86,18 @@ unsigned int MainMemory::getLength()
 
 bool MainMemory::ValidAddress(const unsigned int address)
 {
+	// check that the first few bits of the address are zero
+	// the number of bits to check is the number of bits required to express Cache Line Length 
+	
+	// extracting the first few bits:
+	// bits = address & (powbase2(cacheLineLength) -1)
+	//    Data[address][bits] 
+
+	// (powbase2(cacheLineLength) >> address) is what should be used to index Data[]
+	// then address & cache
+
 	// check range of address
-	if (address >= MainMemory::length)
+	if ( address >= MainMemory::length)
 	{
 		cout << "Memory address out of range!!" << endl;
 		return false;

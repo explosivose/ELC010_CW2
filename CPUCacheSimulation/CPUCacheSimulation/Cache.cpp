@@ -51,13 +51,7 @@ unsigned int Cache::Read(const unsigned int address)
 	if (!Hit())
 	{
 		cout << "Cache Miss!" << endl;
-		if ( block[index].isDirty() )
-		{
-			cout << "Writeback!" << endl;
-			memory->WriteBlock(address, block[index].ReadLine());			// problem: wrong data is read from main memory after a writeback...
-		}
-		cout << "Cache Line Fill From Memory!" << endl;
-		block[index].LineFillFromMemory(tag, memory->ReadBlock(address));
+		Evict(address);
 	}
 	else 
 	{
@@ -84,13 +78,8 @@ void Cache::Write(unsigned int address, unsigned int data)
 	cout << "Cache Write..." << endl;
 	if (!Hit())
 	{
-		if ( block[index].isDirty() )
-		{
-			cout << "Writeback!" << endl;
-			memory->WriteBlock(address, block[index].ReadLine());			// problem: wrong data is read from main memory after a writeback...
-		}
-		cout << "Cache Line Fill From Memory!" << endl;
-		block[index].LineFillFromMemory(tag, memory->ReadBlock(address));
+		cout << "Cache Miss!" << endl;
+		Evict(address);
 	}
 	
 	// re-evaluate cache hit to check that LineFillFromMemory was successful
@@ -213,3 +202,19 @@ bool Cache::ValidIndex()
 		return true;
 	}
 }
+
+// figure out where in main memory the indexed cache block belongs and write it back
+void Cache::Evict(unsigned int address)
+{
+	if (block[index].isDirty())
+	{
+		// reconstruct the address
+		unsigned int t = block[index].Tag() << (selectBitsLength + indexLength);
+		unsigned int i = index << selectBitsLength;
+		unsigned int addr = t | i;
+		cout << "Writeback!" << endl;
+		memory->WriteBlock(addr, block[index].ReadLine());
+	}
+	cout << "Cache line fill from memory!" << endl;
+	block[index].LineFillFromMemory(tag, memory->ReadBlock(address));
+}	
