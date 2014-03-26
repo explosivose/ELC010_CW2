@@ -45,8 +45,9 @@ Cache::~Cache()
 
 unsigned int Cache::Read(const unsigned int address)
 {
+	cout << hex << "Addr:\t0x" << address << endl;
 	ProcessAddress(address);	// extract sel, index and tag
-	cout << hex << "Address:\t" << address << endl;
+	
 	cout << "Cache Read..." << endl;
 	if (!Hit())
 	{
@@ -59,9 +60,7 @@ unsigned int Cache::Read(const unsigned int address)
 	}
 
 	unsigned int data = block[index].ReadWord(sel);
-
-	cout << "Cache Read Data: " << hex << data << endl;
-	cout << endl;
+	cout << hex << "Cache Read Data: 0x" << data << endl;
 	/*
 	bitset<32> b_data(block[index].ReadWord(sel));
 	cout << "Data: \t\t" + b_data.to_string() + " from cache read." << endl;
@@ -73,17 +72,21 @@ unsigned int Cache::Read(const unsigned int address)
 
 void Cache::Write(unsigned int address, unsigned int data)
 {
-	ProcessAddress(address);
-	cout << hex << "Address:\t" << address << "\tData:\t" << data << endl;
+	cout << hex << "Addr:\t0x" << address << "\tData:\t0x" << data << endl;
+	ProcessAddress(address);	// extract sel, index and tag
 	cout << "Cache Write..." << endl;
 	if (!Hit())
 	{
 		cout << "Cache Miss!" << endl;
 		Evict(address);
 	}
-	
-	// re-evaluate cache hit to check that LineFillFromMemory was successful
-	// maybe change LineFillFromMemory to return true on success
+	else 
+	{
+		cout << "Cache Hit!" << endl;
+	}
+
+	// re-evaluate cache hit to check that Evict() was successful
+	// maybe change Evict() to return true on success
 	if (Hit())
 	{
 		cout << "Write data word to cache!" << endl;
@@ -92,9 +95,8 @@ void Cache::Write(unsigned int address, unsigned int data)
 	}
 	else
 	{
-		cout << "Could not write to cache!" << endl;
+		cout << "ERROR: Could not write to cache!" << endl;
 	}
-	cout << endl;
 
 }
 
@@ -158,6 +160,8 @@ void Cache::ProcessAddress(unsigned int address)
 	tag &= address;
 	tag = tag >> (selectBitsLength + indexLength);
 
+	cout << hex << "Tag:\t0x" << tag << endl;
+	cout << hex << "Index:\t0x" << index << endl;
 
 	/* using bitset to print binary
 	bitset<32> b_address(address);
@@ -213,6 +217,7 @@ void Cache::Evict(unsigned int address)
 		unsigned int i = index << selectBitsLength;
 		unsigned int addr = t | i;
 		cout << "Writeback!" << endl;
+		cout << hex << "\tAddr:\t0x" << addr << endl;
 		memory->WriteBlock(addr, block[index].ReadLine());
 	}
 	cout << "Cache line fill from memory!" << endl;

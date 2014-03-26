@@ -49,12 +49,14 @@ void CPUTrace::GetNextInstruction(CPUInstruction& i, ifstream& fs)
 		{
 			i = CPUInstruction(address);
 		}
+		
 	}
 	else
 	{
 		cout << "Could not read trace file!" << endl;
 	}
 }
+
 
 // Private Functions
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
