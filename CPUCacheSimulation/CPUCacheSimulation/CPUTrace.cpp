@@ -26,6 +26,7 @@ CPUTrace::~CPUTrace(void)
 // 
 //
 
+// remember to document that the file must only use address and data hex values that are 4 words long
 void CPUTrace::GetNextInstruction(CPUInstruction& i, ifstream& fs)
 {
 	if ( fs.good() )
@@ -34,23 +35,17 @@ void CPUTrace::GetNextInstruction(CPUInstruction& i, ifstream& fs)
 		getline(fs, readLine);
 		if (fs.eof()) return;
 
-		bool write = false;
 		unsigned int address = strtoul(readLine.substr(4, 8).c_str(), NULL, 16);
 		unsigned int data = 0;
 		
-		// using string length to determine whether it's a read or a write
-		// bad... should be using the first character which will be either R or W
-		if ( readLine.length() > 13 )	
-		{
-			write = true;
-			data = strtoul(readLine.substr(15, 8).c_str(), NULL, 16);
-		}
+		string rw = readLine.substr(0,1);
 
-		if ( write )
+		if ( rw == "W" || rw == "w" )	
 		{
+			data = strtoul(readLine.substr(15, 8).c_str(), NULL, 16);
 			i = CPUInstruction(address, data);
 		}
-		else
+		else if ( rw == "R" || rw == "r" )
 		{
 			i = CPUInstruction(address);
 		}
