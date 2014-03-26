@@ -15,7 +15,7 @@ MainMemory::MainMemory()
 	Data.resize(length);
 	for (unsigned int i = 0; i < length; i++)
 	{
-		Data[i].resize(CacheBlock::getLineLengthWords(), 0);				// initialise to zero
+		Data[i].resize(CacheBlock::getLineLengthWords());
 	}
 }
 
@@ -25,7 +25,7 @@ MainMemory::MainMemory(const unsigned int size)
 	Data.resize(length);
 	for (unsigned int i = 0; i < length; i++)
 	{
-		Data[i].resize(CacheBlock::getLineLengthWords(), 0);				// initialise to zer
+		Data[i].resize(CacheBlock::getLineLengthWords());
 	}
 }
 

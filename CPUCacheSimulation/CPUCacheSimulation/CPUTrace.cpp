@@ -38,7 +38,9 @@ void CPUTrace::GetNextInstruction(CPUInstruction& i, ifstream& fs)
 		unsigned int address = strtoul(readLine.substr(4, 8).c_str(), NULL, 16);
 		unsigned int data = 0;
 		
-		if ( readLine.length() > 13 )
+		// using string length to determine whether it's a read or a write
+		// bad... should be using the first character which will be either R or W
+		if ( readLine.length() > 13 )	
 		{
 			write = true;
 			data = strtoul(readLine.substr(15, 8).c_str(), NULL, 16);

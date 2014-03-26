@@ -54,7 +54,7 @@ unsigned int Cache::Read(const unsigned int address)
 		if ( block[index].isDirty() )
 		{
 			cout << "Writeback!" << endl;
-			memory->WriteBlock(address, block[index].ReadLine());
+			memory->WriteBlock(address, block[index].ReadLine());			// problem: wrong data is read from main memory after a writeback...
 		}
 		cout << "Cache Line Fill From Memory!" << endl;
 		block[index].LineFillFromMemory(tag, memory->ReadBlock(address));
@@ -87,7 +87,7 @@ void Cache::Write(unsigned int address, unsigned int data)
 		if ( block[index].isDirty() )
 		{
 			cout << "Writeback!" << endl;
-			memory->WriteBlock(address, block[index].ReadLine());
+			memory->WriteBlock(address, block[index].ReadLine());			// problem: wrong data is read from main memory after a writeback...
 		}
 		cout << "Cache Line Fill From Memory!" << endl;
 		block[index].LineFillFromMemory(tag, memory->ReadBlock(address));
