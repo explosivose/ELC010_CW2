@@ -39,7 +39,7 @@ unsigned int CacheBlock::getLineLengthWords()
 // constructor alocates memory for cache line
 CacheBlock::CacheBlock()
 {
-	line.resize(CacheBlock::lineLength, 0);
+	line.resize(CacheBlock::lineLength/4, 0);
 	valid = false;
 }
 
@@ -107,7 +107,7 @@ void CacheBlock::isDirty(const bool d)
 
 void CacheBlock::WriteWord(const unsigned int offset, const unsigned int data)
 {
-	if (offset > CacheBlock::lineLength)
+	if (offset > line.size())
 	{
 		cout << "Error! Data offset greater than cache line length" << endl;
 		return;
@@ -124,22 +124,30 @@ void CacheBlock::WriteWord(const unsigned int offset, const unsigned int data)
 // fill the cache line with data
 void CacheBlock::LineFillFromCPU(const unsigned int Tag, const vector<unsigned int>& data)
 {
-	tag = Tag;
-	valid = true;
-	dirty = true;
-	for (unsigned int i = 0; i < CacheBlock::lineLength; i++)
+	if (line.size() == data.size())
 	{
-		line[i] = data[i];
+		tag = Tag;
+		valid = true;
+		dirty = true;
+		line = data;
+	}
+	else
+	{
+		cout << "Line Fill Error: CPU data size differs to cache line size!" << endl;
 	}
 }
 
 void CacheBlock::LineFillFromMemory(const unsigned int Tag, const vector<unsigned int>& data)
 {
-	tag = Tag;
-	valid = true;
-	dirty = false;
-	for (unsigned int i = 0; i < CacheBlock::lineLength; i++)
+	if (line.size() == data.size())
 	{
-		line[i] = data[i];
+		tag = Tag;
+		valid = true;
+		dirty = false;
+		line = data;
+	}
+	else
+	{
+		cout << "Line Fill Error: Memory block size differs to cache line size!" << endl;
 	}
 }
