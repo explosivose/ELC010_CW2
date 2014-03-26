@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 
+using namespace std;
+
 /* Cache Simulation
 
 Implemented as Cache container class and CacheBlock class
@@ -46,13 +48,13 @@ class MainMemory
 
 		void setLength(const unsigned int);
 		unsigned int getLength();
-		unsigned int* ReadBlock(const unsigned int address);				// return data at memory address
-		void WriteBlock(const unsigned int address, const unsigned int* const data);	// write data to memory address
+		vector<unsigned int> ReadBlock(const unsigned int address);				// return data at memory address
+		void WriteBlock(const unsigned int address, const vector<unsigned int>& data);	// write data to memory address
 
 	private:
 
 		unsigned int length;									// size of memory in bytes (default is 4096)
-		unsigned int** Data;
+		vector<vector<unsigned int>> Data;
 
 		bool ValidAddress(const unsigned int address);
 };
@@ -75,14 +77,14 @@ class CacheBlock
 		bool isDirty();
 		unsigned int Tag();											// returns the tag of this block
 		unsigned int ReadWord(const unsigned int);					// returns a data word from the cache line
-		unsigned int* ReadLine();
+		vector<unsigned int> ReadLine();
 
 		// setters
 		void isValid(const bool);
 		void isDirty(const bool);
 		void WriteWord(const unsigned int offset, const unsigned int data);
-		void LineFillFromCPU(const unsigned int Tag, const unsigned int* const data);				// copy CPU data into cache line, set valid and dirty
-		void LineFillFromMemory(const unsigned int Tag, const unsigned int* const data);			// copy memory data into cache line, set valid and not dirty
+		void LineFillFromCPU(const unsigned int Tag, const vector<unsigned int>& data);				// copy CPU data into cache line, set valid and dirty
+		void LineFillFromMemory(const unsigned int Tag, const vector<unsigned int>& data);			// copy memory data into cache line, set valid and not dirty
 
 	private:
 		
@@ -90,8 +92,7 @@ class CacheBlock
 		bool valid;
 		bool dirty;
 		unsigned int tag;	
-		unsigned int* line;
-		
+		vector<unsigned int> line;
 };
 
 
@@ -130,6 +131,6 @@ class Cache
 		unsigned int index;									// index selects a cache block 
 
 		MainMemory* memory;									// pointer to single instance of main memory
-		std::vector<CacheBlock> block;						// dynamic array of cache blocks
+		vector<CacheBlock> block;						// dynamic array of cache blocks
 
 };

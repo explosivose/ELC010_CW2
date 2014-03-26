@@ -12,27 +12,27 @@ using namespace std;
 MainMemory::MainMemory()
 {
 	length = 4096;
-	Data = new unsigned int*[length];
+	Data.resize(length);
 	for (unsigned int i = 0; i < length; i++)
 	{
-		Data[i] = new unsigned int[CacheBlock::getLineLengthWords()];
+		Data[i].resize(CacheBlock::getLineLengthWords(), 0);				// initialise to zero
 	}
 }
 
 MainMemory::MainMemory(const unsigned int size)
 {
 	length = size;
-	Data = new unsigned int*[length];
+	Data.resize(length);
 	for (unsigned int i = 0; i < length; i++)
 	{
-		Data[i] = new unsigned int[CacheBlock::getLineLengthWords()];
+		Data[i].resize(CacheBlock::getLineLengthWords(), 0);				// initialise to zer
 	}
 }
 
 // destructor releases memory used by data*
 MainMemory::~MainMemory(void)
 {
-	delete[] Data;
+	
 }
 
 // public functions
@@ -40,7 +40,7 @@ MainMemory::~MainMemory(void)
 // 
 //
 
-unsigned int* MainMemory::ReadBlock(const unsigned int address)
+std::vector<unsigned int> MainMemory::ReadBlock(const unsigned int address)
 {
 	
 	if ( ValidAddress(address) )
@@ -49,11 +49,11 @@ unsigned int* MainMemory::ReadBlock(const unsigned int address)
 	}
 	else
 	{
-		return 0;
+		return Data[0];
 	}
 }
 
-void MainMemory::WriteBlock(const unsigned int address, const unsigned int* const data)
+void MainMemory::WriteBlock(const unsigned int address, const vector<unsigned int>& data)
 {
 	if ( ValidAddress(address) )
 	{

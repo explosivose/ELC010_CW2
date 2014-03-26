@@ -127,10 +127,6 @@ void Cache::init()
 	
 	// intialise the cache blocks
 	block.resize(length);
-	/*
-	block.reserve(length);
-	for (unsigned int i = 0; i < length; i++)
-		block.push_back( CacheBlock() );*/
 
 	cacheReady = true;
 }

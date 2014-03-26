@@ -39,15 +39,14 @@ unsigned int CacheBlock::getLineLengthWords()
 // constructor alocates memory for cache line
 CacheBlock::CacheBlock()
 {
-	line = new unsigned int[CacheBlock::lineLength]();
+	line.resize(CacheBlock::lineLength, 0);
 	valid = false;
 }
 
 // destructor releases memory used by cache line
 CacheBlock::~CacheBlock()
 {
-	delete[] line;
-	line = 0;
+
 }
 
 // Cache Block getters
@@ -73,7 +72,7 @@ unsigned int CacheBlock::Tag()
 	return tag;
 }
 
-unsigned int* CacheBlock::ReadLine()
+vector<unsigned int> CacheBlock::ReadLine()
 {
 	return line;
 }
@@ -123,7 +122,7 @@ void CacheBlock::WriteWord(const unsigned int offset, const unsigned int data)
 	// or ensure that only memory blocks are passed somehow (since their size is always CacheBlock::lineLength)
 
 // fill the cache line with data
-void CacheBlock::LineFillFromCPU(const unsigned int Tag, const unsigned int* data)
+void CacheBlock::LineFillFromCPU(const unsigned int Tag, const vector<unsigned int>& data)
 {
 	tag = Tag;
 	valid = true;
@@ -134,7 +133,7 @@ void CacheBlock::LineFillFromCPU(const unsigned int Tag, const unsigned int* dat
 	}
 }
 
-void CacheBlock::LineFillFromMemory(const unsigned int Tag, const unsigned int* data)
+void CacheBlock::LineFillFromMemory(const unsigned int Tag, const vector<unsigned int>& data)
 {
 	tag = Tag;
 	valid = true;
