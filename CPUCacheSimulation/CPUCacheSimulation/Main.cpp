@@ -29,10 +29,12 @@ int main()
 
 		if (instruction.isWrite())
 		{
+			cout << "WRITE" << endl;
 			cache.Write(instruction.getAddress(), instruction.getData());
 		}
 		else
 		{
+			cout << "READ" << endl;
 			cache.Read(instruction.getAddress());
 		}
 	}

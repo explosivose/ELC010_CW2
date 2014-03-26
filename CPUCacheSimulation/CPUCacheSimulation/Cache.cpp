@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 #include <vector>
 #include <bitset>
@@ -45,7 +46,7 @@ Cache::~Cache()
 unsigned int Cache::Read(const unsigned int address)
 {
 	ProcessAddress(address);	// extract sel, index and tag
-	
+	cout << hex << "Address:\t" << address << endl;
 	cout << "Cache Read..." << endl;
 	if (!Hit())
 	{
@@ -58,19 +59,28 @@ unsigned int Cache::Read(const unsigned int address)
 		cout << "Cache Line Fill From Memory!" << endl;
 		block[index].LineFillFromMemory(tag, memory->ReadBlock(address));
 	}
+	else 
+	{
+		cout << "Cache Hit!" << endl;
+	}
 
-	
+	unsigned int data = block[index].ReadWord(sel);
+
+	cout << "Cache Read Data: " << hex << data << endl;
+	cout << endl;
+	/*
 	bitset<32> b_data(block[index].ReadWord(sel));
 	cout << "Data: \t\t" + b_data.to_string() + " from cache read." << endl;
 	cout << endl;
+	*/
 
-	return block[index].ReadWord(sel);
+	return data;
 }
 
 void Cache::Write(unsigned int address, unsigned int data)
 {
 	ProcessAddress(address);
-
+	cout << hex << "Address:\t" << address << "\tData:\t" << data << endl;
 	cout << "Cache Write..." << endl;
 	if (!Hit())
 	{
@@ -159,16 +169,17 @@ void Cache::ProcessAddress(unsigned int address)
 	tag &= address;
 	tag = tag >> (selectBitsLength + indexLength);
 
+
 	/* using bitset to print binary
 	bitset<32> b_address(address);
-	bitset<32> b_sel(sel);
-	bitset<32> b_index(index);
-	bitset<32> b_tag(tag);
+	//bitset<32> b_sel(sel);
+	//bitset<32> b_index(index);
+	//bitset<32> b_tag(tag);
 
 	cout << "Address: \t" + b_address.to_string() << endl;
-	cout << "select: \t"  + b_sel.to_string() << endl;
-	cout << "index: \t\t" + b_index.to_string() << endl;
-	cout << "tag: \t\t"   + b_tag.to_string() << endl;
+	//cout << "select: \t"  + b_sel.to_string() << endl;
+	//cout << "index: \t\t" + b_index.to_string() << endl;
+	//cout << "tag: \t\t"   + b_tag.to_string() << endl;
 	//*/
 }
 
@@ -185,7 +196,7 @@ bool Cache::Hit()
 			hit = true;
 		}
 	}
-	
+
 	return hit;
 }
 

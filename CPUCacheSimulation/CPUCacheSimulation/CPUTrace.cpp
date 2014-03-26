@@ -35,13 +35,13 @@ void CPUTrace::GetNextInstruction(CPUInstruction& i, ifstream& fs)
 		if (fs.eof()) return;
 
 		bool write = false;
-		unsigned int address = strtoul(readLine.substr(5, 8).c_str(), NULL, 16);
+		unsigned int address = strtoul(readLine.substr(4, 8).c_str(), NULL, 16);
 		unsigned int data = 0;
-
+		
 		if ( readLine.length() > 13 )
 		{
 			write = true;
-			data = strtoul(readLine.substr(14, 8).c_str(), NULL, 16);
+			data = strtoul(readLine.substr(15, 8).c_str(), NULL, 16);
 		}
 
 		if ( write )
