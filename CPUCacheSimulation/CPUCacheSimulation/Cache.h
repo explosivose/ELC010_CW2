@@ -118,7 +118,6 @@ class Cache
 		void ProcessAddress(unsigned int address);			// calculate sel, tag and index from CPU address
 		bool Hit();											// true or false for cache hit 
 		bool ValidIndex();									// check index range
-		void Evict(unsigned int address);										// check dirty bit and perform writeback if necessary
 
 		unsigned int length;								// size of the cache in bytes (default is 1024)
 		bool cacheReady;									// false if no reference to MainMemory;

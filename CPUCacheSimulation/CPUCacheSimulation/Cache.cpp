@@ -213,8 +213,3 @@ bool Cache::ValidIndex()
 		return true;
 	}
 }
-
-void Cache::Evict(unsigned int address)
-{
-
-}
