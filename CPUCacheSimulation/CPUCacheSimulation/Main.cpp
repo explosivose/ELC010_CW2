@@ -20,7 +20,7 @@ int main()
 
 	CPUTrace trace;
 	CPUInstruction instruction;
-	MainMemory memory;
+	MainMemory memory(8192);
 	Cache cache(&memory);
 	
 	while (!fs.eof())

@@ -87,7 +87,7 @@ unsigned int MainMemory::getLength()
 bool MainMemory::ValidAddress(const unsigned int address)
 {
 	// check range of address
-	if (address > MainMemory::length)
+	if (address >= MainMemory::length)
 	{
 		cout << "Memory address out of range!!" << endl;
 		return false;
