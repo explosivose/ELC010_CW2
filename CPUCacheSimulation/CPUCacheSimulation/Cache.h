@@ -112,6 +112,7 @@ class Cache
 		unsigned int getLength();
 		unsigned int Read(const unsigned int address);				// return data at memory address
 		void Write(const unsigned int address, const unsigned int data);	// write data to memory address
+		float MissRate();
 
 	private:
 
@@ -132,6 +133,11 @@ class Cache
 		unsigned int index;									// index selects a cache block 
 		unsigned int ways;									// number of cache lines a memory block can occupy
 		unsigned int rr;									// round robin index for writebacks
+
+		unsigned int reads;									// count the number of reads
+		unsigned int writes;								// count the nmuber of writes
+		unsigned int hits;									// count the number of cache hits
+		unsigned int misses;								// count the number of cache misses
 
 		MainMemory* memory;									// pointer to single instance of main memory
 		vector<vector<CacheBlock>> block;					// dynamic array of cache blocks

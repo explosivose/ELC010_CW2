@@ -9,6 +9,32 @@ using namespace std;
 int main()
 {
 	// ask the user for cache simulation parameters
+	cout << "CPU Cache Simulation" << endl;
+	cout << "Author:\tMatt Blickem" << endl;
+	cout << "March 2014" << endl;
+	cout << endl;
+
+	string input;
+	
+	cout << "How many data words in a cache line?" << endl;
+	getline(cin, input);
+	unsigned int L = strtoul(input.c_str(), NULL, 0);
+	CacheBlock::setLineLength(L);
+	
+	cout << "What is the size of main memory?" << endl;
+	getline(cin, input);
+	unsigned int M = strtoul(input.c_str(), NULL, 0);
+	MainMemory memory(M);
+
+	cout << "What is the size of cache memory in bytes?" << endl;
+	getline(cin, input);
+	unsigned int C = strtoul(input.c_str(), NULL, 0);
+
+	cout << "How many cache ways?" << endl;
+	getline(cin, input);
+	unsigned int W = strtoul(input.c_str(), NULL, 0);
+
+	Cache cache(&memory, C, W);
 
 
 	// open trace file for reading
@@ -44,8 +70,8 @@ int main()
 	// start CPU Cache Simulation
 	CPUTrace trace;
 	CPUInstruction instruction;
-	MainMemory memory(1048575);
-	Cache cache(&memory, 1024, 2);
+	
+	
 	
 	cout << endl;
 	cout << "SIMULATION START" << endl;
@@ -73,6 +99,7 @@ int main()
 	cout << endl;
 	cout << "SIMULATION END" << endl;
 	cout << endl;
+	cout << fixed << "Cache Miss Rate:\t" << cache.MissRate() << endl;
 
 	// restore cout stream buffer
 	cout.rdbuf(backupbuf);

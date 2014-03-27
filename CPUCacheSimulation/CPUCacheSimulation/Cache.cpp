@@ -69,11 +69,14 @@ unsigned int Cache::Read(const unsigned int address)
 	if( w == -1 )
 	{
 		cout << "Cache Miss!" << endl;
+		misses++;
 		w = Evict(address);
 	}
 	else 
 	{
 		cout << "Cache Hit!" << endl;
+		cout << "Using way:\t" << w << endl;
+		hits++;
 	}
 
 	unsigned int data = block[w][index].ReadWord(sel);
@@ -101,11 +104,14 @@ void Cache::Write(unsigned int address, unsigned int data)
 	if (w == -1)
 	{
 		cout << "Cache Miss!" << endl;
+		misses++;
 		w = Evict(address);
 	}
 	else 
 	{
 		cout << "Cache Hit!" << endl;
+		cout << "Using way:\t" << w << endl;
+		hits++;
 	}
 	
 	cout << "Write data word to cache!" << endl;
@@ -113,6 +119,14 @@ void Cache::Write(unsigned int address, unsigned int data)
 	block[w][index].isDirty(true);
 	
 
+}
+
+float Cache::MissRate()
+{
+	cout << "Hits:\t" << hits << "\tMisses:\t" << misses << endl;
+	float m = misses;
+	float hm = hits+misses;
+	return m / hm;
 }
 
 // Private functions
@@ -148,6 +162,10 @@ void Cache::init()
 		block[w].resize(length/ways);
 	}
 	rr = 0;
+	hits = 0;
+	misses = 0;
+	reads = 0;
+	writes = 0;
 	cacheReady = true;
 
 	cout << "---Cache Parameters---" << endl;
@@ -246,7 +264,8 @@ unsigned int Cache::Evict(unsigned int address)
 	{
 		if ( !block[w][index].isValid() )
 		{
-			cout << "Found unused cache block to use." << endl;
+			cout << "Using way:\t" << w << endl;
+			cout << "Cache Fill from memory!" << endl;
 			block[w][index].LineFillFromMemory(tag, memory->ReadBlock(address));
 			return w;
 		}
@@ -255,11 +274,14 @@ unsigned int Cache::Evict(unsigned int address)
 	cout << "All mapped cache blocks are in use." << endl;
 
 	// next favour clean cache blocks
+	// this shouldn't really happen though!
+	// just use round robin after failing to find invalid cache block
 	for (unsigned int w = 0; w < ways; w++)
 	{
 		if ( !block[w][index].isDirty() )
 		{
-			cout << "Using first mapped non-dirty cache block" << endl;
+			cout << "Using way:\t" << w << endl;
+			cout << "Cache fill from memory!" << endl;
 			block[w][index].LineFillFromMemory(tag, memory->ReadBlock(address));
 			return w;
 		}
@@ -271,7 +293,7 @@ unsigned int Cache::Evict(unsigned int address)
 	unsigned int w = rr;
 	rr++;
 	if (rr >= ways) rr = 0;
-
+	cout << "Using way:\t" << w << endl;
 	// reconstruct address
 	unsigned int t = block[w][index].Tag() << (selectBitsLength + indexLength);
 	unsigned int i = index << selectBitsLength;
