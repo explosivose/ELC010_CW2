@@ -46,12 +46,13 @@ class MainMemory
 		MainMemory(const unsigned int bytes);
 		~MainMemory();
 
-		void setLength(const unsigned int);
 		unsigned int getLength();
 		vector<unsigned int> ReadBlock(const unsigned int address);				// return data at memory address
 		void WriteBlock(const unsigned int address, const vector<unsigned int>& data);	// write data to memory address
 
 	private:
+
+		void init();
 
 		unsigned int length;									// size of memory in bytes (default is 4096)
 		vector<vector<unsigned int>> Data;
@@ -104,10 +105,10 @@ class Cache
 		// constructor / destructor
 		Cache();
 		Cache(MainMemory*);
-		Cache(MainMemory*, unsigned int);
+		Cache(MainMemory*, unsigned int size);
+		Cache(MainMemory*, unsigned int size, unsigned int Ways);
 		~Cache();
 
-		void setLength(const unsigned int);
 		unsigned int getLength();
 		unsigned int Read(const unsigned int address);				// return data at memory address
 		void Write(const unsigned int address, const unsigned int data);	// write data to memory address
@@ -116,9 +117,9 @@ class Cache
 
 		void init();										// allocate memory for cache, calculate bit lengths for sel, tag and index
 		void ProcessAddress(unsigned int address);			// calculate sel, tag and index from CPU address
-		bool Hit();											// true or false for cache hit 
+		bool Hit(unsigned int w);											// true or false for cache hit 
 		bool ValidIndex();									// check index range
-		void Evict(unsigned int address);										// figure out where in main memory the indexed cache block belongs and write it back
+		unsigned int Evict(unsigned int address);										// figure out where in main memory the indexed cache block belongs and write it back
 
 		unsigned int length;								// size of the cache in bytes (default is 1024)
 		bool cacheReady;									// false if no reference to MainMemory;
@@ -129,8 +130,10 @@ class Cache
 		unsigned int sel;									// select bits choose a data word in a cache line or memory block
 		unsigned int tag;									// tag indicates which memory block is currently in cache line
 		unsigned int index;									// index selects a cache block 
+		unsigned int ways;									// number of cache lines a memory block can occupy
+		unsigned int rr;									// round robin index for writebacks
 
 		MainMemory* memory;									// pointer to single instance of main memory
-		vector<CacheBlock> block;							// dynamic array of cache blocks
+		vector<vector<CacheBlock>> block;					// dynamic array of cache blocks
 
 };

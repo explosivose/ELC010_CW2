@@ -12,21 +12,13 @@ using namespace std;
 MainMemory::MainMemory()
 {
 	length = 4096;
-	Data.resize(length);
-	for (unsigned int i = 0; i < length; i++)
-	{
-		Data[i].resize(CacheBlock::getLineLengthWords());
-	}
+	init();
 }
 
 MainMemory::MainMemory(const unsigned int size)
 {
 	length = size;
-	Data.resize(length);
-	for (unsigned int i = 0; i < length; i++)
-	{
-		Data[i].resize(CacheBlock::getLineLengthWords());
-	}
+	init();
 }
 
 // destructor releases memory used by data*
@@ -70,12 +62,17 @@ void MainMemory::WriteBlock(const unsigned int address, const vector<unsigned in
 //
 //
 
-// sets a new main memory length
-// todo: resize existing data*
-//		OR: do nothing if there are any instances of MainMemory
-void MainMemory::setLength(const unsigned int len)
+// initialisation
+void MainMemory::init()
 {
-	MainMemory::length = len;
+	Data.resize(length);
+	for (unsigned int i = 0; i < length; i++)
+	{
+		Data[i].resize(CacheBlock::getLineLengthWords());
+	}
+	cout << "---Main Memory Parameters---" << endl;
+	cout << "Memory Size:\t" << length << endl;
+	cout << endl;
 }
 
 // return the length of main memory

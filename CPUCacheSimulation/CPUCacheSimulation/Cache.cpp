@@ -17,12 +17,14 @@ Cache::Cache()
 {
 	length = 1024;
 	cacheReady = false;
+	ways = 1;
 }
 
 Cache::Cache(MainMemory* mainMemory)
 {
 	length = 1024;
 	memory = mainMemory;
+	ways = 1;
 	init();
 }
 
@@ -30,6 +32,15 @@ Cache::Cache(MainMemory* mainMemory, unsigned int size)
 {
 	length = size;
 	memory = mainMemory;
+	ways = 1;
+	init();
+}
+
+Cache::Cache(MainMemory* mainMemory, unsigned int size, unsigned int Ways)
+{
+	length = size;
+	memory = mainMemory;
+	ways = Ways;
 	init();
 }
 
@@ -49,17 +60,23 @@ unsigned int Cache::Read(const unsigned int address)
 	ProcessAddress(address);	// extract sel, index and tag
 	
 	cout << "Cache Read..." << endl;
-	if (!Hit())
+	unsigned int w = -1;
+	for (unsigned int i = 0; i < ways; i++)
+	{
+		if (Hit(i)) w = i;
+	}
+
+	if( w == -1 )
 	{
 		cout << "Cache Miss!" << endl;
-		Evict(address);
+		w = Evict(address);
 	}
 	else 
 	{
 		cout << "Cache Hit!" << endl;
 	}
 
-	unsigned int data = block[index].ReadWord(sel);
+	unsigned int data = block[w][index].ReadWord(sel);
 	cout << hex << "Cache Read Data: 0x" << data << endl;
 	/*
 	bitset<32> b_data(block[index].ReadWord(sel));
@@ -75,28 +92,26 @@ void Cache::Write(unsigned int address, unsigned int data)
 	cout << hex << "Addr:\t0x" << address << "\tData:\t0x" << data << endl;
 	ProcessAddress(address);	// extract sel, index and tag
 	cout << "Cache Write..." << endl;
-	if (!Hit())
+	unsigned int w = -1;
+	for (unsigned int i = 0; i < ways; i++)
+	{
+		if (Hit(i)) w = i;
+	}
+
+	if (w == -1)
 	{
 		cout << "Cache Miss!" << endl;
-		Evict(address);
+		w = Evict(address);
 	}
 	else 
 	{
 		cout << "Cache Hit!" << endl;
 	}
-
-	// re-evaluate cache hit to check that Evict() was successful
-	// maybe change Evict() to return true on success
-	if (Hit())
-	{
-		cout << "Write data word to cache!" << endl;
-		block[index].WriteWord(sel, data);
-		block[index].isDirty(true);
-	}
-	else
-	{
-		cout << "ERROR: Could not write to cache!" << endl;
-	}
+	
+	cout << "Write data word to cache!" << endl;
+	block[w][index].WriteWord(sel, data);
+	block[w][index].isDirty(true);
+	
 
 }
 
@@ -111,31 +126,37 @@ void Cache::init()
 	// for log2() i'm using maths: log2(x) = log(x)/log(2)
 
 	// number of select bits depends on the number of words in a cache line
-	//		= floor(log2(CacheBlock::lineLength/4)) + 1
-	//		floor(log2(16/4)) + 1 = 3 (should be 2....)
+	//		= ceil(log2(CacheBlock::lineLength/4)) 
 	// the select bits are the first bits in the address (from the left)
 	selectBitsLength = ceil(log(CacheBlock::getLineLengthWords())/log(2));
 	
 	// number of index bits depends on number of cache blocks
-	//		= floor(log2(Cache::length)) + 1
-	//		floor(log2(1024)) + 1 = 11
-	indexLength = ceil(log(length)/log(2));
+	//		= ceil(log2((Cache::length/ways)/CacheBlock::lineLength))
+	indexLength = ceil(log((length/ways)/CacheBlock::getLineLengthBytes())/log(2));
+	//indexLength = ceil(log(length)/log(2)); // this is incorrect!
 
 	// number of tag bits depends on memory length and cache length
-	//		= floor(log2(Memory::length / Cache::length)) + 1
-	//		floor(log2(4096/1024)) + 1 = 3 (should be 2...)
+	//		= ceil(log2(Memory::length / Cache::length)) 
+	//		ceil(log2(4096/1024)) = 2
 	tagLength = ceil(log(memory->getLength()/length)/log(2));
 	
+
 	// intialise the cache blocks
-	block.resize(length);
-
+	block.resize(ways);
+	for (unsigned int w = 0; w < ways; w++)
+	{
+		block[w].resize(length/ways);
+	}
+	rr = 0;
 	cacheReady = true;
-}
 
-// this function should also resize the block!
-void Cache::setLength(const unsigned int len)
-{
-	length = len;
+	cout << "---Cache Parameters---" << endl;
+	cout << "Number of ways:\t" << ways << endl;
+	cout << "Cache Size:\t" << length << endl;
+	cout << "Index Length:\t" << indexLength << endl;
+	cout << "Tag Length:\t" << tagLength << endl;
+	cout << endl;
+
 }
 
 unsigned int Cache::getLength()
@@ -176,19 +197,21 @@ void Cache::ProcessAddress(unsigned int address)
 	//*/
 }
 
-bool Cache::Hit()
+bool Cache::Hit(unsigned int w)
 {
 	if (!ValidIndex()) return false;
 
 	bool hit = false;
 
-	if (block[index].isValid())
+
+	if (block[w][index].isValid())
 	{
-		if (block[index].Tag() == tag)
+		if (block[w][index].Tag() == tag)
 		{
 			hit = true;
 		}
 	}
+	
 
 	return hit;
 }
@@ -196,7 +219,7 @@ bool Cache::Hit()
 bool Cache::ValidIndex()
 {
 	// check range of address
-	if (index >= Cache::length)
+	if (index >= length/ways)
 	{
 		cout << "Cache index out of range!!" << endl;
 		return false;
@@ -208,18 +231,57 @@ bool Cache::ValidIndex()
 }
 
 // figure out where in main memory the indexed cache block belongs and write it back
-void Cache::Evict(unsigned int address)
+
+// eviction shall select which way index to use in cache
+
+// Evict() is called on cache miss
+// find a cache block to populate
+// writeback to main memory if we're using a valid dirty block
+// return the ways index that was used
+unsigned int Cache::Evict(unsigned int address)
 {
-	if (block[index].isDirty())
+	
+	// first find invalid cache blocks to use
+	for (unsigned int w = 0; w < ways; w++)
 	{
-		// reconstruct the address
-		unsigned int t = block[index].Tag() << (selectBitsLength + indexLength);
-		unsigned int i = index << selectBitsLength;
-		unsigned int addr = t | i;
-		cout << "Writeback!" << endl;
-		cout << hex << "\tAddr:\t0x" << addr << endl;
-		memory->WriteBlock(addr, block[index].ReadLine());
+		if ( !block[w][index].isValid() )
+		{
+			cout << "Found unused cache block to use." << endl;
+			block[w][index].LineFillFromMemory(tag, memory->ReadBlock(address));
+			return w;
+		}
 	}
+	
+	cout << "All mapped cache blocks are in use." << endl;
+
+	// next favour clean cache blocks
+	for (unsigned int w = 0; w < ways; w++)
+	{
+		if ( !block[w][index].isDirty() )
+		{
+			cout << "Using first mapped non-dirty cache block" << endl;
+			block[w][index].LineFillFromMemory(tag, memory->ReadBlock(address));
+			return w;
+		}
+	}
+
+	cout << "All mapped cache blocks are dirty." << endl;
+
+	// round robin method for writebacks
+	unsigned int w = rr;
+	rr++;
+	if (rr >= ways) rr = 0;
+
+	// reconstruct address
+	unsigned int t = block[w][index].Tag() << (selectBitsLength + indexLength);
+	unsigned int i = index << selectBitsLength;
+	unsigned int addr = t | i;
+	cout << "Writeback!" << endl;
+	cout << hex << "\tAddr:\t0x" << addr << endl;
+	memory->WriteBlock(addr, block[w][index].ReadLine());
+
 	cout << "Cache line fill from memory!" << endl;
-	block[index].LineFillFromMemory(tag, memory->ReadBlock(address));
+	block[w][index].LineFillFromMemory(tag, memory->ReadBlock(address));
+	return w;
+
 }	

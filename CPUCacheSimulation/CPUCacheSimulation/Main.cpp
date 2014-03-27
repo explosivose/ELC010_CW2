@@ -8,6 +8,10 @@ using namespace std;
 
 int main()
 {
+	// ask the user for cache simulation parameters
+
+
+	// open trace file for reading
 	ifstream tracefile;
 	tracefile.open("trace.txt");
 
@@ -19,6 +23,7 @@ int main()
 		return 0;
 	}
 
+	// open output.log for writing
 	ofstream outputfile;
 	outputfile.open("output.log");
 
@@ -39,9 +44,13 @@ int main()
 	// start CPU Cache Simulation
 	CPUTrace trace;
 	CPUInstruction instruction;
-	MainMemory memory(16348);
-	Cache cache(&memory);
+	MainMemory memory(1048575);
+	Cache cache(&memory, 1024, 2);
 	
+	cout << endl;
+	cout << "SIMULATION START" << endl;
+	cout << endl;
+
 	while (!tracefile.eof())
 	{
 		trace.GetNextInstruction(instruction, tracefile);
@@ -61,11 +70,16 @@ int main()
 	}
 	tracefile.close();
 
+	cout << endl;
+	cout << "SIMULATION END" << endl;
+	cout << endl;
+
 	// restore cout stream buffer
 	cout.rdbuf(backupbuf);
 	outputfile.close();
 
-	cout << "Simulation Complete. See output.log file for details" << endl;
+	cout << "Simulation Complete." << endl;
+	cout << "See output.log file for details" << endl;
 
 	cin.ignore();
 	return 0;
