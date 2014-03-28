@@ -9,6 +9,3 @@ static int powbase2(unsigned int power)
 		result *= 2;
 	return result;
 }
-
-// could write a static report() function for printing messages to screen
-// report function does nothing if bool debug = false

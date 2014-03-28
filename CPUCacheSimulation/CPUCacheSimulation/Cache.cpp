@@ -123,7 +123,7 @@ void Cache::Write(unsigned int address, unsigned int data)
 
 float Cache::MissRate()
 {
-	cout << "Hits:\t" << hits << "\tMisses:\t" << misses << endl;
+	cout << dec << "Hits:\t" << hits << "\tMisses:\t" << misses << endl;
 	float m = misses;
 	float hm = hits+misses;
 	return m / hm;

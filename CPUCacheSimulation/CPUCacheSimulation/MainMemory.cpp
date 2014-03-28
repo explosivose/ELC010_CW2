@@ -17,10 +17,6 @@ MainMemory::MainMemory()
 
 MainMemory::MainMemory(const unsigned int size)
 {
-	if (length > Data.max_size()) 
-	{
-		cout << "size too large!" << endl;
-	}
 	length = size;
 	init();
 }
